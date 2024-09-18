@@ -1,0 +1,18 @@
+{
+  "name": "houseDev",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.6.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.5",
+    "sucrase": "^3.35.0"
+  }
+}
