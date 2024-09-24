@@ -1,5 +1,4 @@
-const mongoose = require('mongoose'); // Importa o mongoose
-const { Schema, model } = mongoose;
+import { Schema, model } from 'mongoose';
 
 const HouseSchema = new Schema({
   thumbnail: String,
@@ -7,11 +6,18 @@ const HouseSchema = new Schema({
   price: Number,
   location: String,
   status: Boolean,
-  user: {
+  user:{
     type: Schema.Types.ObjectId,
-    ref: 'User',
-  },
+    ref: 'User'
+  }
+}, {
+  toJSON: {
+    virtuals: true
+  }
 });
 
-module.exports = model('House', HouseSchema);
+HouseSchema.virtual('thumbnail_url').get(function(){
+  return `http://localhost:3333/files/${this.thumbnail}`;
+})
 
+export default model('House', HouseSchema);

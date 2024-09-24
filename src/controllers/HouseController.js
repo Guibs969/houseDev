@@ -1,67 +1,76 @@
-const House = require('../models/House');
+import House from '../models/House';
+import User from '../models/User';
 
-class HouseController {
+class HouseController{
 
-    async index(req, res){
+  async index(req, res){
+    const { status } = req.query;
 
-        const { status } = req.query;
-
-        const houses = await House.find({ status});
-
-        return res.json(houses);
-
-    }
-
-
-
-    async store(req, res) {
-        const { filename } = req.file;
-        const { description, price, location, status } = req.body;
-        const { user_id } = req.headers;
-
-        try {
-            const house = await House.create({
-                user: user_id,
-                thumbnail: filename,
-                description,
-                price,
-                location,
-                status,
-            });
-
-            return res.json(house);
-        } catch (error) {
-            return res.status(400).json({ error: 'Erro ao criar casa.' });
-        }
-    }
-
-
-    async update(req, res){
-
-        const { filename } = req.file;
-        const {house_id} = req.params;
-        const { description, price, location, status } = req.body;
-        const { user_id } = req.headers;
-
-
-        const houses = await House.updateOne({_id: house_id },{
-            user: user_id,
-            thumbnail: filename,
-            description,
-            price,
-            location,
-            status,
-
-
-    });
+    const houses = await House.find({ status });
 
     return res.json(houses);
+  }
 
+  async store(req, res){
+    const { filename } = req.file;
+    const { description, price, location, status } = req.body;
+    const { user_id } = req.headers;
+
+    const house = await House.create({
+      user: user_id,
+      thumbnail: filename,
+      description,
+      price,
+      location,
+      status,
+    });
+
+    return res.json(house);
+  }
+
+  async update(req, res){
+    const { filename } = req.file;
+    const { house_id } = req.params;
+    const { description, price, location, status } = req.body;
+    const { user_id } = req.headers;
+
+
+    const user = await User.findById(user_id);
+    const houses = await House.findById(house_id);
+
+    if(String(user._id) !== String(houses.user)){
+      return res.status(401).json({ error: 'Não autorizado.'});
     }
 
+    await House.updateOne({ _id: house_id  }, {
+      user: user_id,
+      thumbnail: filename,
+      description,
+      price,
+      location,
+      status,
+    });
+    
+    
+    return res.send();
+  }
 
+  async destroy(req, res){
+    const { house_id } = req.body;
+    const { user_id } = req.headers;
+
+    const user = await User.findById(user_id);
+    const houses = await House.findById(house_id);
+
+    if(String(user._id) !== String(houses.user)){
+      return res.status(401).json({ error: 'Não autorizado.'});
+    }
+
+    await House.findByIdAndDelete({ _id: house_id});
+
+    return res.json({message: "Excluida com sucesso!" });
+  }
 
 }
 
-// Exportando a instância da classe
-module.exports = new HouseController();
+export default new HouseController();
